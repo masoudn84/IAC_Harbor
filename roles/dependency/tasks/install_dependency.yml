@@ -1,0 +1,28 @@
+---
+
+- name: remove old packages
+  yum:
+    name: "{{ item }}"
+    state: absent
+  loop:
+    - docker 
+    - docker-client 
+    - docker-client-latest 
+    - docker-common 
+    - docker-latest 
+    - docker-latest-logrotate 
+    - docker-logrotate 
+    - docker-engine
+
+- name: Install required system using yum
+  #yum: name={{ item }} state=latest update_cache=yes
+  yum: 
+      name: "{{ item }}"
+      state: latest
+      update_cache: yes
+    #loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'python3-pip', 'virtualenv', 'python3-setuptools' ]
+  loop: 
+      - yum-utils
+      - lvm2
+      - python3-pip
+      - device-mapper-persistent-data

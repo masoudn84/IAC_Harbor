@@ -1,0 +1,51 @@
+---
+- name: copy images to server
+  copy:
+    src: images
+    dest: /root/
+- name: copy files to server
+  copy:
+    src: tar
+    dest: /root/
+- name: extract harbor
+  unarchive: 
+      src: /root/tar/harbor-online-installer-v1.2.0.tgz
+      dest: /root
+      remote_src: yes
+- name: load images
+  shell: |
+    cd images && docker load -i {{ item }}
+  loop:
+    - harbor-adminserver.tar
+    - harbor-db.tar
+    - harbor-jobservice.tar
+    - harbor-ui.tar
+    - nginx-photon.tar
+    - registry-2.6.2-photon.tar
+- name: create docker directory
+  file:
+    path: /etc/docker
+    state: directory
+    group: docker
+- name: copy docker daemon.json
+  template:
+    src: daemon.json.j2
+    dest: /etc/docker/daemon.json
+    mode: '644'
+
+
+- name: copy config file to server
+  template:
+    src: harbor.cfg.j2
+    dest: /root/harbor/harbor.cfg
+  
+- name: copy cert file to server
+  copy:
+    src: harbor_cert
+    dest: /etc/ssl/certs/
+- name: install harbor
+  shell: |
+    cd /root/harbor && ./install.sh
+- name: run harbor container
+  shell: |
+    cd /root/harbor && docker-compose up -d

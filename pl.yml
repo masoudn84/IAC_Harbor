@@ -1,0 +1,18 @@
+---
+- name: install docker
+  hosts: harbor
+  gather_facts: false
+  vars:
+    - harbor_hostname: 'harbor.gajmarket.com'
+    - harbor_db_pass: '12345'
+    - harbor_admin_password: 'admin'
+  roles:
+   - dependency
+   - add_repo
+   - install_docker
+   - service
+   #- firewall
+   - harbor_files
+   - service
+
+
